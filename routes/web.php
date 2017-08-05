@@ -10,7 +10,14 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', [
+        'uses' => '\App\Http\Controllers\EndpointController@index',
+        'as' => 'home'
+    ]
+);
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/error', [
+        'uses' => '\App\Http\Controllers\ErrorController@index',
+        'as' => 'error'
+    ]
+)->middleware(['lang']);
