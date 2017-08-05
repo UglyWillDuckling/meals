@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CategoriesTableCreate extends Migration
+class CreateLanguageTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CategoriesTableCreate extends Migration
      */
     public function up()
     {
-        Schema::create('category', function (Blueprint $table) {
+        Schema::create('language', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('slug');;
+
+            $table->string('slug');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CategoriesTableCreate extends Migration
      */
     public function down()
     {
-        Schema::drop('category');
+        Schema::drop('language');
     }
 }
