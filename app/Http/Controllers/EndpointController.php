@@ -21,12 +21,14 @@ class EndpointController extends Controller
         DB::enableQueryLog();
         $meals = $this->getMeals();
 
+        $attrs;
         foreach ($meals as $meal) {
             $meal->setAttribute('tags', $meal->tags());
             $meal->setAttribute('ingredients', $meal->ingredients());
+            $attrs = $meal->getAttributes();
         }
 
-        var_dump(DB::getQueryLog());
+        var_dump($attrs);
     }
 
     private function generateQuery()
@@ -35,7 +37,7 @@ class EndpointController extends Controller
         $query = Meal::query();
 
         $query
-            ->join('meals_translation as mt', function (\Illuminate\Database\Query\JoinClause $join) use() {
+            ->join('meals_translation as mt', function (\Illuminate\Database\Query\JoinClause $join) use($request) {
                 $join->on('mt.meal_id', '=', 'meals.id');
                 $join->where(
                     'mt.language_id', '=', $request->lang);
@@ -58,13 +60,14 @@ class EndpointController extends Controller
     {
         $query = $this->generateQuery();
 
-        //check with paramater
+        //check the with paramater
         $with = [
-            'meals.*'
+            'meals.id as meal_id',
+            'meals.status as status',
+            'mt.description as description',
         ];
 
-
-
+        $query->groupBy('meals.id');
         return $query->get($with);
     }
 }

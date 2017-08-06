@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 
 
-class Error extends Controller
+class ErrorController extends Controller
 {
     public function index()
     {

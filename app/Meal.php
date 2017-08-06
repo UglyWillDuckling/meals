@@ -21,7 +21,7 @@ class Meal extends Model
     {
         return $this->belongsToMany(
             'App\Tag', 'meals_tags', 'meal_id', 'tag_id')
-            ->jo();
+            ->get();
     }
 
     /**

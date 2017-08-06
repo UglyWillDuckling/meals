@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class CheckLangParam
+class BeforeCheckLangParam
 {
     /**
      * Handle an incoming request.
@@ -15,9 +15,9 @@ class CheckLangParam
      */
     public function handle($request, Closure $next)
     {
-//todo enable this if ($request->lang) {
-//            return redirect('error');
-//        }
+        if (!$request->lang) {
+            return redirect('error');
+        }
         return $next($request);
     }
 }
