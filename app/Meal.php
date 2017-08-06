@@ -13,12 +13,6 @@ class Meal extends Model
      */
     private $request;
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->request = app()->make('Illuminate\Http\Request');
-    }
-
     protected $table = 'meals';
 
     protected $fillable = [
@@ -26,9 +20,16 @@ class Meal extends Model
         'category_id',
         'slug'
     ];
+    protected $hidden = [
+        'category_id'
+    ];
 
-
-    /**
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->request = app()->make('Illuminate\Http\Request');
+    }
+        /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function tags()
@@ -60,5 +61,20 @@ class Meal extends Model
                 'tt.title',
                 'slug',
             ]);
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function category()
+    {
+        return $this->belongsTo('App\Category', 'category_id')
+            ->join('category_translation as ct', function (\Illuminate\Database\Query\JoinClause $join) {
+                $join->on('ct.category_id', '=', 'category.id');
+                $join->where('ct.language_id', '=', $this->request->lang);
+            })->addSelect([
+                'category.id as id',
+                'ct.title',
+                'slug',
+            ]);;
     }
 }

@@ -58,15 +58,10 @@ class EndpointController extends Controller
     {
         $query = $this->generateQuery();
 
-        $fields = [
-            'meals.id as id',
-            'meals.status as status',
-            'mt.description as description',
-        ];
         $query->groupBy('meals.id');
 
-        $query->with('tags');
-        $query->with('ingredients');
+        $fields = $this->getFields();
+        $this->addRelations($query);
 
         return $query->get($fields);
     }
@@ -76,5 +71,24 @@ class EndpointController extends Controller
      */
     private function getTags(){
         return explode(',', $this->request->tags);
+    }
+
+    private function addRelations($query)
+    {
+        $with = explode(',', $this->request->with);
+        foreach ($with as $relation) {
+            $query->with($relation);
+        }
+    }
+
+    private function getFields()
+    {
+        return [
+            'meals.id as id',
+            'meals.status as status',
+            'meals.category_id',
+            'mt.description as description',
+            'mt.title as title',
+        ];
     }
 }
