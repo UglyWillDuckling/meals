@@ -14,6 +14,7 @@ class EndpointController extends Controller
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->with = $request->with ?: array();
     }
 
     public function index()
@@ -21,16 +22,12 @@ class EndpointController extends Controller
         DB::enableQueryLog();
         $meals = $this->getMeals();
 
-        $attrs;
-        foreach ($meals as $meal) {
-            $meal->setAttribute('tags', $meal->tags());
-            $meal->setAttribute('ingredients', $meal->ingredients());
-            $attrs = $meal->getAttributes();
-        }
-
-        var_dump($attrs);
+        dd($meals->toArray());
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     private function generateQuery()
     {
         $request = $this->request;
@@ -44,30 +41,40 @@ class EndpointController extends Controller
              });
 
         if ($request->tags) {
-            $tags = explode(',', $request->tags);
-
+            $tags = $this->getTags();
             $query
                 ->join('meals_tags as mtgs', function (\Illuminate\Database\Query\JoinClause $join) use ($tags) {
                     $join->on('mtgs.meal_id', '=', 'meals.id');
                     $join->whereIn('mtgs.tag_id', $tags);
                 });
         }
-
         return $query;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
     private function getMeals()
     {
         $query = $this->generateQuery();
 
-        //check the with paramater
-        $with = [
-            'meals.id as meal_id',
+        $fields = [
+            'meals.id as id',
             'meals.status as status',
             'mt.description as description',
         ];
-
         $query->groupBy('meals.id');
-        return $query->get($with);
+
+        $query->with('tags');
+        $query->with('ingredients');
+
+        return $query->get($fields);
+    }
+
+    /**
+     * @return array
+     */
+    private function getTags(){
+        return explode(',', $this->request->tags);
     }
 }

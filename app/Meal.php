@@ -20,8 +20,7 @@ class Meal extends Model
     public function tags()
     {
         return $this->belongsToMany(
-            'App\Tag', 'meals_tags', 'meal_id', 'tag_id')
-            ->get();
+            'App\Tag', 'meals_tags', 'meal_id', 'tag_id');
     }
 
     /**
@@ -30,7 +29,6 @@ class Meal extends Model
     public function ingredients()
     {
         return $this->belongsToMany(
-            'App\Ingredient', 'meals_ingredients', 'meal_id', 'ingredient_id')
-            ->get();
+            'App\Ingredient', 'meals_ingredients', 'meal_id', 'ingredient_id');
     }
 }
