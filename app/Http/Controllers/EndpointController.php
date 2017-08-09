@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -20,26 +19,27 @@ class EndpointController extends Controller
     public function index()
     {
         DB::enableQueryLog();
-        $meals = $this->getMeals();
+        $response = $this->getResponse();
 
-        dd($meals->toArray());
-
-//        dd(DB::getQueryLog());
+        dd(($response));
+//      dd(DB::getQueryLog());
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    private function getMeals()
+    protected function getResponse()
     {
         $query = $this->generateQuery();
 
-        $query->groupBy('meals.id');
-
-        $fields = $this->getFields();
-        $this->addRelations($query);
-
-        return $query->get($fields);
+        $result = $query->groupBy('meals.id')
+            ->paginate(
+                $this->request->perpage,
+                $this->getFields(),
+                'page',
+                $this->request->page
+            );
+        return $this->generateResponse($result);
     }
 
     /**
@@ -79,33 +79,64 @@ class EndpointController extends Controller
             $query->where('status', '=', 1);
         }
 
+        $this->addRelations($query);
+        $query->groupBy('meals.id');
+
         return $query;
     }
 
     /**
      * @return array
      */
-    private function getTags()
-    {
+    private function getTags(){
         return explode(',', $this->request->tags);
     }
 
-    private function addRelations($query)
-    {
+    /**
+     * @param $query
+     */
+    private function addRelations($query) {
         $with = explode(',', $this->request->with);
         foreach ($with as $relation) {
             $query->with($relation);
         }
     }
 
-    private function getFields()
-    {
+    private function getFields(){
         return [
             'meals.id as id',
             'meals.status as status',
             'meals.category_id',
             'mt.description as description',
             'mt.title as title',
+        ];
+    }
+
+    /**
+     * @param $meals
+     * @return array
+     */
+    private function generateResponse($meals)
+    {
+        //generate links
+        $meals->appends(
+            $this->request->all()
+        );
+
+        //create response array
+        return [
+            'meta' => [
+                'currentPage' => $meals->currentPage(),
+                'totalItems' => $meals->total(),
+                'itemsPerPage' =>$meals->perPage(),
+                'totalPages' =>$meals->lastPage(),
+            ],
+            'data' => [$meals->getCollection()->toArray()],
+            'links' => [
+                'prev' => $meals->previousPageUrl(),
+                'next' => $meals->nextPageUrl(),
+                'self' => $this->request->fullUrl(),
+            ]
         ];
     }
 }
