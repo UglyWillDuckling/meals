@@ -12,7 +12,6 @@ class CategoryTableSeeder extends Seeder
     public function run()
     {
         $faker = Faker\Factory::create();
-
         foreach (range(0, 5) as $i) {
             $slug = $faker->word;
             DB::table('category')->insert([
@@ -24,14 +23,15 @@ class CategoryTableSeeder extends Seeder
             $id = DB::table('category')
                 ->getConnection()->getPdo()->lastInsertId();
 
-            DB::table('category_translation')->insert([
-                'category_id' => $id,
-                'language_id' => 1,
-                'title' => $slug,//todo translate title
-                'language_id' => 1,
-                'created_at' => $faker->dateTime,
-                'updated_at' => $faker->dateTime,
-            ]);
+            foreach (DB::table('language')->get() as $language) {
+                DB::table('category_translation')->insert([
+                    'category_id' => $id,
+                    'language_id' => $language->id,
+                    'title' => $slug . " {$language->name}",
+                    'created_at' => $faker->dateTime,
+                    'updated_at' => $faker->dateTime,
+                ]);
+            }
         }
     }
 }

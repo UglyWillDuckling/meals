@@ -16,18 +16,35 @@ class MealsTable extends Seeder
         $faker = Faker\Factory::create();
 
         factory(App\Meal::class, 5)->create()->each(function ($meal) use ($faker) {
-//            $meal->tags()->save(factory(App\Tag::class)->make());
-//            $meal->ingredients()->save(factory(App\Ingredient::class)->make());
+            $tag = $meal->tags()->save(factory(App\Tag::class)->make());
+            $ingredient = $meal->ingredients()->save(factory(App\Ingredient::class)->make());
 
-            DB::table('meals_translation')->insert([
-                'meal_id' => $meal->id,
-                'language_id' => 1,
-                'title' => $meal->slug,
-                'description' => $faker->paragraph(1),
-                'created_at' => $faker->dateTime(),
-                'updated_at' => $faker->dateTime(),
-            ]);
+            foreach (DB::table('language')->get() as $language) {
+                DB::table('meals_translation')->insert([
+                    'meal_id' => $meal->id,
+                    'language_id' => $language->id,
+                    'title' => $meal->slug . " {$language->name}",
+                    'description' => $faker->paragraph(1) . " {$language->name}",
+                    'created_at' => $faker->dateTime(),
+                    'updated_at' => $faker->dateTime(),
+                ]);
 
+                DB::table('tags_translation')->insert([
+                    'tag_id' => $tag->id,
+                    'language_id' => $language->id,
+                    'title' => $tag->slug . " {$language->name}",
+                    'created_at' => $faker->dateTime(),
+                    'updated_at' => $faker->dateTime(),
+                ]);
+                DB::table('ingredient_translation')->insert([
+                    'tag_id' => $ingredient->id,
+                    'language_id' => $language->id,
+                    'title' => $ingredient->slug . " {$language->name}",
+                    'created_at' => $faker->dateTime(),
+                    'updated_at' => $faker->dateTime(),
+                ]);
+
+            }
         });
     }
 }
