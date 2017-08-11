@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 
-class MealsTable extends Seeder
+class MealsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -36,8 +36,8 @@ class MealsTable extends Seeder
                     'created_at' => $faker->dateTime(),
                     'updated_at' => $faker->dateTime(),
                 ]);
-                DB::table('ingredient_translation')->insert([
-                    'tag_id' => $ingredient->id,
+                DB::table('ingredients_translation')->insert([
+                    'ingredient_id' => $ingredient->id,
                     'language_id' => $language->id,
                     'title' => $ingredient->slug . " {$language->name}",
                     'created_at' => $faker->dateTime(),

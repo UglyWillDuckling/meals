@@ -124,7 +124,7 @@ class Meal
                 'itemsPerPage' =>$meals->perPage(),
                 'totalPages' =>$meals->lastPage(),
             ],
-            'data' => [$meals->getCollection()->toArray()[0]],
+            'data' => $meals->getCollection()->toArray(),
             'links' => [
                 'prev' => $meals->previousPageUrl(),
                 'next' => $meals->nextPageUrl(),

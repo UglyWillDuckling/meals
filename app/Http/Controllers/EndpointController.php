@@ -22,7 +22,7 @@ class EndpointController extends Controller
         DB::enableQueryLog();
         $response = $this->mealHelper->getResponse();
 
-        dd(($response));
+        dd( json_encode($response,JSON_FORCE_OBJECT));
 //      dd(DB::getQueryLog());
     }
 }
