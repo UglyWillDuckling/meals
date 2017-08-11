@@ -25,9 +25,13 @@ class CreateMealsTranslationTable extends Migration
             //foreign key
             $table->foreign('meal_id')->references('id')
                 ->on('meals')->onDelete('cascade')->onUpdate('cascade');
+
+
             $table->foreign('language_id')->references('id')
                 ->on('language')->onDelete('cascade')->onUpdate('cascade');
             //foreign key
+
+
             $table->timestamps();
         });
     }

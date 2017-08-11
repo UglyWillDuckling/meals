@@ -19,10 +19,10 @@ class EndpointController extends Controller
 
     public function index()
     {
-        DB::enableQueryLog();
         $response = $this->mealHelper->getResponse();
 
-        dd( json_encode($response,JSON_FORCE_OBJECT));
-//      dd(DB::getQueryLog());
+        echo json_encode(
+            $response, JSON_FORCE_OBJECT
+        );
     }
 }
