@@ -14,7 +14,7 @@ Route::get('/', [
         'uses' => '\App\Http\Controllers\EndpointController@index',
         'as' => 'home'
     ]
-)->middleware('lang');;
+)->middleware(['requiredApi:lang']);;
 
 Route::get('/error', [
         'uses' => '\App\Http\Controllers\ErrorController@index',
