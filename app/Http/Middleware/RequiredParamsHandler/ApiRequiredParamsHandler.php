@@ -10,6 +10,7 @@ class ApiRequiredParamsHandler extends \App\Http\Middleware\RequiredParamsHandle
     {
         return response()
             ->json(['success' => false])
+            ->header('Content-Type', 'application/json')
             ->setStatusCode(Response::HTTP_OK);
     }
 }
