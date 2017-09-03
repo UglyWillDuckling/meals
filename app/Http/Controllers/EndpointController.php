@@ -1,8 +1,8 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
 use App\Http\Helper\Meal;
+use App\Http\Response\Transform\Api as TransformApi;
 
 
 class EndpointController extends Controller
@@ -11,18 +11,21 @@ class EndpointController extends Controller
      * @var Meal
      */
     private $mealHelper;
+    /**
+     * @var Transform
+     */
+    private $transformApi;
 
-    public function __construct(Meal $mealHelper)
+    public function __construct(Meal $mealHelper, TransformApi $transformApi)
     {
         $this->mealHelper = $mealHelper;
+        $this->transformApi = $transformApi;
     }
 
     public function index()
     {
-        $response = $this->mealHelper->getResponse();
-
-        echo json_encode(
-            $response, JSON_FORCE_OBJECT
+        return $this->transformApi->transform(
+            $this->mealHelper->getResponse()
         );
     }
 }
