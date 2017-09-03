@@ -6,5 +6,4 @@ interface TransformInterface
 {
     public function transform($responseData);
 }
-
 ?>

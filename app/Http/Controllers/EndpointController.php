@@ -24,6 +24,8 @@ class EndpointController extends Controller
 
     public function index()
     {
+        return $this->mealHelper->getResponse();
+
         return $this->transformApi->transform(
             $this->mealHelper->getResponse()
         );
