@@ -44,7 +44,7 @@ class MealResponse extends Api
             'links' => [
                 'prev' => $meals->previousPageUrl(),
                 'next' => $meals->nextPageUrl(),
-                'self' => $this->request->fullUrlWithQuery(),
+                'self' => $this->request->fullUrl(),
             ]
         ];
     }

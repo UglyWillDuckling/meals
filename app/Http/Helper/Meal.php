@@ -11,9 +11,9 @@ class Meal
      */
     private $request;
     /**
-     * @var Meal\Filter
+     * @var Meal\QueryBuilder
      */
-    private $filter;
+    private $queryBuilder;
     /**
      * @var \App\Http\Response\Transform\Api\MealResponse
      */
@@ -22,11 +22,11 @@ class Meal
 
     public function __construct(
         Request $request,
-        \App\Http\Helper\Meal\Filter $filter,
+        \App\Http\Helper\Meal\QueryBuilder $queryBuilder,
         \App\Http\Response\Transform\Api\MealResponse $mealResponse)
     {
         $this->request = $request;
-        $this->filter = $filter;
+        $this->queryBuilder = $queryBuilder;
         $this->mealResponse = $mealResponse;
     }
 
@@ -35,7 +35,7 @@ class Meal
      */
     public function getResponse()
     {
-        $query = $this->filter->generateQuery();
+        $query = $this->queryBuilder->generateQuery($this->request->all());
 
         $result = $query->paginate(
                 $this->request->perpage,
