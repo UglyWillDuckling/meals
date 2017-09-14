@@ -11,11 +11,15 @@ class Meal extends Model
     const   STATUS_DISABLED = 2;
     const   STATUS_ENABLED  = 1;
 
+    public static $table_aliases = [
+        'meals_translation' => 'mt',
+        'meals_tags' => 'mtgs'
+    ];
+
     /**
      * @var Request
      */
     protected $request;
-
 
     protected $table = 'meals';
 
@@ -102,5 +106,14 @@ class Meal extends Model
                 'ct.title',
                 'slug',
             ]);
+    }
+
+    /**
+     * @param $alias
+     * @return bool|mixed
+     */
+    public static function getTableAlias($alias)
+    {
+        return isset(self::$table_aliases[$alias]) ? self::$table_aliases[$alias] : false;
     }
 }

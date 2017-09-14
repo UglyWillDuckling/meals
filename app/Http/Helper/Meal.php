@@ -2,6 +2,7 @@
 namespace App\Http\Helper;
 
 use Illuminate\Http\Request;
+use App\Meal as MealModel;
 
 
 class Meal
@@ -31,7 +32,7 @@ class Meal
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return array
      */
     public function getResponse()
     {
@@ -48,8 +49,10 @@ class Meal
             ->mealResponse->buildResponse($result, $this->request->all());
     }
 
-    protected function getFields()
-    {
+    /**
+     * @return array
+     */
+    protected function getFields(){
         $fields = [
             'meals.id as id',
             'meals.status as status',
@@ -57,11 +60,8 @@ class Meal
         ];
 
         if ($this->request->lang) {
-            $fields[] = $this->queryBuilder->getTableAlias('meals_translation') .
-                '.description as description';
-
-            $fields[] = $this->queryBuilder->getTableAlias('meals_translation') .
-                '.title as title';
+            $fields[] = MealModel::getTableAlias('meals_translation') . '.description as description';
+            $fields[] = MealModel::getTableAlias('meals_translation') . '.title as title';
         }
         return $fields;
     }

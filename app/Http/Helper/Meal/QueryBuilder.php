@@ -7,13 +7,6 @@ use App\Meal as MealModel;
 
 class QueryBuilder
 {
-    const   STATUS_ENABLED  = 1;
-    const   STATUS_DISABLED = 2;
-
-    protected $table_aliases = [
-       'meals_translation' => 'mt'
-    ];
-
     /**
      * @var Request
      */
@@ -23,6 +16,7 @@ class QueryBuilder
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->query  = MealModel::query();
     }
 
     /**
@@ -33,7 +27,7 @@ class QueryBuilder
         /**
          * @var $query \Illuminate\Database\Eloquent\Builder
          */
-        $query = MealModel::query();
+        $query = $this->query;
 
         if (!empty($fields['lang'])) {
             $this->addLang($fields['lang'], $query);
@@ -44,7 +38,7 @@ class QueryBuilder
                 $query, $fields['diff_time']);
         } else {
             $this->filterStatus(
-                $query, self::STATUS_ENABLED);
+                $query, MealModel::STATUS_ENABLED);
         }
 
         //filter the query
@@ -52,7 +46,8 @@ class QueryBuilder
 
         $this->addRelations(
             $query, $fields['with'], !empty($fields['lang']));
-        $query->groupBy('meals.id');
+        $query->groupBy(
+            $query->getModel()->getTable().'.id');
 
         return $query;
     }
@@ -79,18 +74,35 @@ class QueryBuilder
         $query->where('status', '=', $status);
     }
 
-    protected function addLang($lang, $query)
+    /**
+     * @param $lang
+     */
+    protected function addLang($lang)
     {
-        $query
-            ->join('meals_translation as mt', function (\Illuminate\Database\Query\JoinClause $join) use ($lang) {
+        $this->query
+            ->join('meals_translation as ' .
+                MealModel::getTableAlias('meals_translation'), function (\Illuminate\Database\Query\JoinClause $join) use ($lang) {
                 $join->on(
-                    'mt.meal_id', '=', 'meals.id');
+                    MealModel::getTableAlias('meals_translation') . '.meal_id',
+                    '=',
+                    $this->query->getModel()->getTable().'.id'
+                );
                 $join->where(
-                    'mt.language_id', '=', $lang);
+                    MealModel::getTableAlias('meals_translation') . '.language_id',
+                    '=',
+                    $lang
+                );
             });
     }
 
-    public function filter(array $fields, $query)
+    /**
+     * filter by given fields using specific filter classes
+     *
+     * @param array $fields
+     *
+     *TODO refactor so it uses a default filter when a filter class does not exist
+     */
+    public function filter(array $fields)
     {
         foreach ($fields as $field => $value) {
             $decorator =
@@ -99,7 +111,7 @@ class QueryBuilder
                     str_replace('_', ' ', $field)));
 
             if (class_exists($decorator)) {
-                $decorator::filter($query, $value);
+                $decorator::filter($this->query, $value);
             }
         }
     }
@@ -107,7 +119,7 @@ class QueryBuilder
     /**
      * @param $query
      */
-    public function addRelations(\Illuminate\Database\Eloquent\Builder $query, $with, $lang = false) {
+    public function addRelations($with, $lang = false) {
         if(is_string($with)) {
             $with = explode(',', $with);
         }
@@ -115,10 +127,10 @@ class QueryBuilder
         foreach ($with as $relation)
         {
             if ($lang) {
-                $query->with($relation . 'WithTranslation');
+                $this->query->with($relation . 'WithTranslation');
                 continue;
             }
-            $query->with($relation);
+            $this->query->with($relation);
         }
     }
 
