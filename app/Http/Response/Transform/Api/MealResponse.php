@@ -25,28 +25,35 @@ class MealResponse extends Api
      * @param $meals
      * @return array
      */
-    public function buildResponse($meals)
+    public function buildResponse($mealsResult, $fields, $meta = true, $links = true)
     {
-        //generate links
-        $meals->appends(
-            $this->request->all()
+        $mealsResult->appends(
+            $fields
         );
 
-        //create response array
-        return [
-            'meta' => [
-                'currentPage' => $meals->currentPage(),
-                'totalItems' => $meals->total(),
-                'itemsPerPage' =>$meals->perPage(),
-                'totalPages' =>$meals->lastPage(),
-            ],
-            'data' => $meals->getCollection()->toArray(),
-            'links' => [
-                'prev' => $meals->previousPageUrl(),
-                'next' => $meals->nextPageUrl(),
-                'self' => $this->request->fullUrl(),
-            ]
+        /* create response array */
+
+        $response = [
+            'data' => $mealsResult->getCollection()->toArray(),
         ];
+
+        if ($meta) {
+            $response['meta'] = [
+                'currentPage'  => $mealsResult->currentPage(),
+                'totalItems'   => $mealsResult->total(),
+                'itemsPerPage' => $mealsResult->perPage(),
+                'totalPages'   => $mealsResult->lastPage(),
+            ];
+        }
+
+        if ($links) {
+            $response['links'] = [
+                'prev' => $mealsResult->previousPageUrl(),
+                'next' => $mealsResult->nextPageUrl(),
+                'self' => $this->request->fullUrl(),
+            ];
+        }
+
+        return $response;
     }
 }
-?>

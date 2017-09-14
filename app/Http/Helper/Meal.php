@@ -35,7 +35,10 @@ class Meal
      */
     public function getResponse()
     {
-        $query = $this->queryBuilder->generateQuery($this->request->all());
+        $query = $this->queryBuilder
+            ->generateQuery($this->request->all());
+
+        dd($query->toSql()) ;
 
         $result = $query->paginate(
                 $this->request->perpage,
@@ -43,16 +46,26 @@ class Meal
                 'page',
                 $this->request->page
             );
-        return $this->mealResponse->buildResponse($result);
+        return $this->mealResponse
+            ->buildResponse(
+                $result, $this->request->all());
     }
 
-    public function getFields(){
-        return [
+    protected function getFields()
+    {
+        $fields = [
             'meals.id as id',
             'meals.status as status',
             'meals.category_id',
-            'mt.description as description',
-            'mt.title as title',
         ];
+
+        if ($this->request->lang) {
+            $fields[] = $this->queryBuilder->getTableAlias('meals_translation') .
+                '.description as description';
+
+            $fields[] = $this->queryBuilder->getTableAlias('meals_translation') .
+                '.title as title';
+        }
+        return $fields;
     }
 }
