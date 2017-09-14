@@ -133,9 +133,4 @@ class QueryBuilder
             $this->query->with($relation);
         }
     }
-
-    public function getTableAlias($tableName)
-    {
-        return $this->table_aliases[$tableName];
-    }
 }
