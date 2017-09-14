@@ -35,20 +35,17 @@ class Meal
      */
     public function getResponse()
     {
-        $query = $this->queryBuilder
-            ->generateQuery($this->request->all());
-
-        dd($query->toSql()) ;
+        $query = $this
+            ->queryBuilder->generateQuery($this->request->all());
 
         $result = $query->paginate(
                 $this->request->perpage,
                 $this->getFields(),
                 'page',
                 $this->request->page
-            );
-        return $this->mealResponse
-            ->buildResponse(
-                $result, $this->request->all());
+        );
+        return $this
+            ->mealResponse->buildResponse($result, $this->request->all());
     }
 
     protected function getFields()

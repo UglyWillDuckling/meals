@@ -13,5 +13,3 @@ class Category implements FilterInterface
     }
 }
 
-?>
-

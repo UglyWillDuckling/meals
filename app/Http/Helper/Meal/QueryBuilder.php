@@ -40,7 +40,8 @@ class QueryBuilder
         }
 
         if (!empty($fields['diff_time'])) {
-            $this->filterTime($query, $fields['diff_time']);
+            $this->filterTime(
+                $query, $fields['diff_time']);
         } else {
             $this->filterStatus(
                 $query, self::STATUS_ENABLED);
@@ -62,18 +63,18 @@ class QueryBuilder
      * @param $time
      * @param string $field
      */
-    public function filterTime(\Illuminate\Database\Eloquent\Builder $query, $time, $field = 'updated_at')
+    protected function filterTime(\Illuminate\Database\Eloquent\Builder $query, $time, $field = 'updated_at')
     {
         $query->where(
-            'meals.'.$field, '>=', date("Y-m-d h:i:s", strtotime($time)
-        ));
+            'meals.'.$field, '>=', date("Y-m-d h:i:s", strtotime($time))
+        );
     }
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param $status
      */
-    public function filterStatus(\Illuminate\Database\Eloquent\Builder $query, $status)
+    protected function filterStatus(\Illuminate\Database\Eloquent\Builder $query, $status)
     {
         $query->where('status', '=', $status);
     }
@@ -98,7 +99,7 @@ class QueryBuilder
                     str_replace('_', ' ', $field)));
 
             if (class_exists($decorator)) {
-                $query = $decorator::filter($query, $value);
+                $decorator::filter($query, $value);
             }
         }
     }

@@ -8,10 +8,14 @@ use Illuminate\Http\Request;
 
 class Meal extends Model
 {
+    const   STATUS_DISABLED = 2;
+    const   STATUS_ENABLED  = 1;
+
     /**
      * @var Request
      */
-    private $request;
+    protected $request;
+
 
     protected $table = 'meals';
 
