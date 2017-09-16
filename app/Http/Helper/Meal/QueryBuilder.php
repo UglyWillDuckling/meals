@@ -26,6 +26,7 @@ class QueryBuilder
     /**
      * @param array $fields
      * @return \Illuminate\Database\Eloquent\Builder
+     * TODO move this method to the helper
      */
     public function generateQuery(array $fields)//todo maybe add a group by param(other options too)
     {
@@ -61,8 +62,7 @@ class QueryBuilder
      * @param $time
      * @param string $field
      */
-    protected function filterTime(\Illuminate\Database\Eloquent\Builder $query, $time, $field = 'updated_at')
-    {
+    protected function filterTime(\Illuminate\Database\Eloquent\Builder $query, $time, $field = 'updated_at') {
         $query->where(
             'meals.'.$field, '>=', date("Y-m-d h:i:s", strtotime($time))
         );
@@ -72,8 +72,7 @@ class QueryBuilder
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @param $status
      */
-    protected function filterStatus(\Illuminate\Database\Eloquent\Builder $query, $status)
-    {
+    protected function filterStatus(\Illuminate\Database\Eloquent\Builder $query, $status) {
         $query->where('status', '=', $status);
     }
 
@@ -118,7 +117,6 @@ class QueryBuilder
             }
         }
     }
-
 
     /**
      * @param $with

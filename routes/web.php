@@ -21,3 +21,9 @@ Route::get('/error', [
         'as' => 'error'
     ]
 );
+
+Route::get('/repo', [
+        'uses' => '\App\Http\Controllers\EndpointController@repotest',
+        'as' => 'repotest'
+    ]
+);
