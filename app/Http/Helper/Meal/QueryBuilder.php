@@ -12,17 +12,22 @@ class QueryBuilder
      */
     private $request;
 
-
+    /**
+     * QueryBuilder constructor.
+     * @param Request $request
+     */
     public function __construct(Request $request)
     {
         $this->request = $request;
         $this->query  = MealModel::query();
     }
 
+
     /**
+     * @param array $fields
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function generateQuery(array $fields)
+    public function generateQuery(array $fields)//todo maybe add a group by param(other options too)
     {
         /**
          * @var $query \Illuminate\Database\Eloquent\Builder
@@ -45,9 +50,7 @@ class QueryBuilder
         $this->filter($fields, $query);
 
         $this->addRelations(
-            $query, $fields['with'], !empty($fields['lang']));
-        $query->groupBy(
-            $query->getModel()->getTable().'.id');
+           $fields['with'], !empty($fields['lang']));
 
         return $query;
     }
@@ -116,16 +119,17 @@ class QueryBuilder
         }
     }
 
+
     /**
-     * @param $query
+     * @param $with
+     * @param bool $lang
      */
-    public function addRelations($with, $lang = false) {
+    protected function addRelations($with, $lang=false) {
         if(is_string($with)) {
             $with = explode(',', $with);
         }
 
-        foreach ($with as $relation)
-        {
+        foreach ($with as $relation) {
             if ($lang) {
                 $this->query->with($relation . 'WithTranslation');
                 continue;

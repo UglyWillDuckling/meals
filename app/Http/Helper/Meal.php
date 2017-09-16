@@ -37,7 +37,12 @@ class Meal
     public function getResponse()
     {
         $query = $this
-            ->queryBuilder->generateQuery($this->request->all());
+            ->queryBuilder->generateQuery(
+                $this->request->all()
+            );
+        $query->groupBy(
+            $query->getModel()->getTable().'.id'
+        );
 
         $result = $query->paginate(
                 $this->request->perpage,
