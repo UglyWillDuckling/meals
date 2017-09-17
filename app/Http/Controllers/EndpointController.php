@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Helper\Meal;
 use App\Http\Response\Transform\Api as TransformApi;
 use App\Repository\RepositoryInterface;
+use App\Repository\Repositories\MealRepository;
 
 
 class EndpointController extends Controller
@@ -21,11 +22,11 @@ class EndpointController extends Controller
      */
     private $repository;
 
-    public function __construct(Meal $mealHelper, TransformApi $transformApi)
+    public function __construct(Meal $mealHelper, TransformApi $transformApi, RepositoryInterface $repository)
     {
         $this->mealHelper = $mealHelper;
         $this->transformApi = $transformApi;
-//        $this->repository = $repository;
+        $this->repository = $repository;
     }
 
     public function index()

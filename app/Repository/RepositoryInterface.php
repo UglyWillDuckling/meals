@@ -20,7 +20,7 @@ interface RepositoryInterface
      * @param $value
      * @return mixed
      */
-    public function getBy($field, $value, $operator);
+    public function getBy($field, $value);
 
     /**
      * @param $field
@@ -36,11 +36,16 @@ interface RepositoryInterface
      * @param null $where
      * @return mixed
      */
-    public function update($field, $values,  $operator, $where);
+    public function update($field, $values);
 
     /**
      * @param array $attributes
      * @return mixed
      */
     public function create(array $attributes = []);
+
+    /**
+     * @return mixed
+     */
+    public function getModel();
 }
