@@ -14,5 +14,16 @@ class Tag extends Model
         'slug'
     ];
 
+    const TABLE_TRANSLATION = 'tags_translation';
+    const TABLE_TRANSLATION_ALIAS = 'tt';
 
+
+    public function getTranslationTable()
+    {
+        return self::TABLE_TRANSLATION;
+    }
+    public function getTranslationAlias()
+    {
+        return self::TABLE_TRANSLATION_ALIAS;
+    }
 }

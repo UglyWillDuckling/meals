@@ -13,6 +13,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Meal;
 use App\Repository\RepositoryInterface;
 use App\Repository\Repositories\MealRepository;
+use App\Repository\Repositories\MealRepositoryInterface;
 
 
 class RepositoryProvider extends ServiceProvider
@@ -21,11 +22,12 @@ class RepositoryProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(RepositoryInterface::class, function ($app) {
+        $this->app->bind(MealRepositoryInterface::class, MealRepository::class);
+
+        $this->app->singleton(MealRepository::class, function ($app) {
             return new MealRepository(new Meal());
         });
 
-        $this->app->bind(
-            MealRepository::class, RepositoryInterface::class);
+
     }
 }
