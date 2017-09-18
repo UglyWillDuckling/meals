@@ -27,7 +27,5 @@ class RepositoryProvider extends ServiceProvider
         $this->app->singleton(MealRepository::class, function ($app) {
             return new MealRepository(new Meal());
         });
-
-
     }
 }

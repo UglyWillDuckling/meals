@@ -8,15 +8,18 @@ use App\Meal;
 
 class MealRepository extends AbstractRepository implements MealRepositoryInterface
 {
+    public $table = 'meals';
+
     /**
      * @var \Illuminate\Database\Eloquent\Builder
      */
     private $query;
 
-    public function __construct(\Illuminate\Database\Eloquent\Model $model)
+    public function __construct(Meal $model)
     {
         parent::__construct($model);
-        $this->query = Meal::query();
+        $this->mealQuery = Meal::query();
+        $this->query = app()->make('Illuminate\Database\Eloquent\Builder');;
     }
 
 
@@ -47,46 +50,65 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         }
     }
 
-    private function _joinTranslationTable(
+    private function _joinTranslationTable(//TODO extrapolate this method into a different class
         \Illuminate\Database\Eloquent\Builder $query,
-        \Illuminate\Database\Eloquent\Relations\Relation $relation, $lang)
+        \Illuminate\Database\Eloquent\Relations\Relation $relation, $meals, $lang)
     {
+        //reset wheres
+        $query->getQuery()->wheres = [];
+
+        $ids = $meals->pluck('id')->toArray();
+
         $language_table = $relation->getRelated()->getTranslationTable();
         $language_alias = $relation->getRelated()->getTranslationAlias();
-        $related_table = $relation->getRelated()->getTable();
+        $related_table = $relation->getModel()->getTable();
+        $pivot = $relation->getTable();
 
-        $relation->join("{$language_table} as {$language_alias}", function (\Illuminate\Database\Query\JoinClause $join)
+
+        $query->join("{$pivot}", function (\Illuminate\Database\Query\JoinClause $join)
+        use($ids, $pivot) {
+            $join->on("{$pivot}.tag_id", '=', 'tag.id');
+            $join->whereIn("{$pivot}.meals_id", $ids);
+        });
+
+        $query->join("{$language_table} as {$language_alias}", function (\Illuminate\Database\Query\JoinClause $join)
         use($language_alias, $lang) {
             $join->on("{$language_alias}.tag_id", '=', 'tag.id');
             $join->where('tt.language_id', '=', $lang);
-        })->addSelect([
-            "{$related_table}.id as id",
-            "{$language_alias}.title",
-            'slug',
-        ]);
+        });
 
-        return $relation;
+        $query->rightJoin("{$relation->getTable()} as mtgs", function (\Illuminate\Database\Query\JoinClause $join) use($ids) {
+            $join->whereIn('mtgs.meal_id', $ids);
+        });
+
+        $query->addSelect([//TODO put the fields from select to different classses
+                "{$related_table}.id as id",
+                "{$language_alias}.title",
+                "{$related_table}.slug"
+            ]);
+
+        return $query->get();
     }
 
 
-    public function getAllWithTranslations($relations = [], $lang = 'HR')
+    public function getAllWithTranslations($relations = [], $lang = '1')
     {
-
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = $this->query;
 
+        if (!$all = $this->all()) {
+            return false;
+        }
 
         foreach ($relations as $index => $relation) {
             if (method_exists($this->getModel(), $relation)) {
                 $relation = $this->getModel()->{$relation}();
-                $relation = $this->_joinTranslationTable($relation, $lang);
+                $result = $this->_joinTranslationTable($query, $relation, $all, $lang);
             }
             else {
                 unset($relations[$index]);
             }
         }
-        return $query->with($relations)->get();
-
     }
 
 
