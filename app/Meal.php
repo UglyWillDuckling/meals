@@ -71,12 +71,12 @@ class Meal extends Model
     public function ingredientsWithTranslation()
     {
         return $this->ingredients()
-            ->join('ingredients_translation as tt', function (\Illuminate\Database\Query\JoinClause $join) {
+            ->join('ingredients_translation as it', function (\Illuminate\Database\Query\JoinClause $join) {
                 $join->on('tt.ingredient_id', '=', 'ingredient.id');
                 $join->where('tt.language_id', '=', $this->request->lang);
             })->addSelect([
                 'ingredient.id as id',
-                'tt.title',
+                'it.title',
                 'slug',
             ]);
     }

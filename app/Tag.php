@@ -16,6 +16,7 @@ class Tag extends Model
 
     const TABLE_TRANSLATION = 'tags_translation';
     const TABLE_TRANSLATION_ALIAS = 'tt';
+    const PIVOT_FOREIGN_KEY = 'tag_id';
 
 
     public function getTranslationTable()
@@ -25,5 +26,10 @@ class Tag extends Model
     public function getTranslationAlias()
     {
         return self::TABLE_TRANSLATION_ALIAS;
+    }
+
+    public function getMealsForeignKey()
+    {
+        return self::PIVOT_FOREIGN_KEY;
     }
 }
