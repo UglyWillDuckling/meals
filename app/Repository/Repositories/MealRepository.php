@@ -64,8 +64,10 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         \Illuminate\Database\Eloquent\Builder $query,
         \Illuminate\Database\Eloquent\Relations\Relation $relation, $meals, $lang)
     {
-        //reset wheres
+        //reset the query
         $query->getQuery()->wheres = [];
+        $query->getQuery()->columns = [];
+        $query->getQuery()->joins = [];
 
         $ids = $meals->pluck('id')->toArray();
         $relatedModel = $relation->getModel();
@@ -86,10 +88,12 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         });
 
         $query->join("{$language_table} as {$language_alias}", function (\Illuminate\Database\Query\JoinClause $join)
-        use($language_alias, $lang, $relatedModel) {
-            $join->on("{$language_alias}.{$relatedModel->getForeignKey()}", '=', 'tag.id');
+        use($language_alias, $lang, $relatedModel,$related_table) {
+            $join->on("{$language_alias}.{$relatedModel->getForeignKey()}", '=', "{$related_table}.id");
             $join->where("{$language_alias}.language_id", '=', $lang);
         });
+
+        $query->select = [];
 
         $query->addSelect([//TODO put the fields from select to different classses
                 "{$related_table}.id as id",
@@ -97,7 +101,6 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
                 "{$related_table}.slug",
                 "{$pivot}.meal_id"
             ]);
-
         return $query->get();
     }
 
@@ -127,8 +130,17 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         return $result;
     }
 
-    protected function _joinResultsToModels($results, $models)
+    protected function _joinResultsToModels(array $results, $models, $foreign_key = 'meal_id')
     {
-
+        foreach ($results as $relation => $result) {
+            foreach ($result as $row) {
+                foreach ($models as $parentItem) {
+                    if ($parentItem->id == $row->{$foreign_key}) {
+                        $parentItem->setAttribute($relation, $row);
+                    }
+                }
+            }
+        }
+        return $models;
     }
 }

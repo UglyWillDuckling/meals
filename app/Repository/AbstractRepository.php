@@ -21,7 +21,7 @@ class AbstractRepository implements RepositoryInterface
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function all(){
-        return $this->getModel()->getQuery()->get();
+        return $this->getModel()->all();
     }
 
     /**

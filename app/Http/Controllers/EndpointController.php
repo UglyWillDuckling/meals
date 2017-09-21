@@ -40,9 +40,8 @@ class EndpointController extends Controller
     {
         $repository = $this->repository;
 
-//        $repository->attachTranslations();
         $all =$repository->getAllWithTranslations([
-            'tags'
+            'tags', 'ingredients'
         ]);
 
         dd($all->first());
