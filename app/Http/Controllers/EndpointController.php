@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Helper\Meal;
@@ -47,8 +48,16 @@ class EndpointController extends Controller
                 'operator' => '=',
                 'value' => 3
             ]
-        ]);
+        ], [],
+            [
+                [
+                    'table' => 'meals_translation',
+                    'table_alias' => 'mt',
+                    'operator' => '='
+                ]
 
+            ]
+        );
 
         dd($result);
     }

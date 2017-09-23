@@ -116,9 +116,10 @@ class AbstractRepository implements RepositoryInterface
         if ($joins) {
             $this->_addJoins($joins);
         }
-
-        $query->addSelect($columns ?: '*');
-        return $query->get();
+        return $query
+            ->addSelect(
+                $columns ?: '*')
+            ->get();
     }
 
     /**
@@ -129,15 +130,15 @@ class AbstractRepository implements RepositoryInterface
         $query = $this->getQuery();
         foreach ($joins as $join) {
             if (!isset($join['type'])) {
-                $join['type'] == 'innerJoin';
+                $join['type'] = 'join';
             }
             //todo check if it works with method replaced with array value
             $query->{$join['type']}("{$join['table']} as {$join['table_alias']}",
                 function (\Illuminate\Database\Query\JoinClause $joinClause) use ($join, $query) {
                     $joinClause->on(
-                        "{$join['table_alias']}.{$query->getForeignKey()}",
-                        $join['on']['operator'],
-                        "{$query->getTable()}.id"
+                        "{$join['table_alias']}.{$this->getModel()->getForeignKey()}",
+                        $join['operator'],
+                        "{$this->getModel()->getTable()}.id"
                     );
 
                     if (isset($join['where'])) {
