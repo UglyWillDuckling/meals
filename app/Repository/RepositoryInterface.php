@@ -20,7 +20,15 @@ interface RepositoryInterface
      * @param $value
      * @return mixed
      */
-    public function getBy($field, $value);
+    public function getBy($field, $value, $operator);
+
+
+    /**
+     * @param array $conditions
+     * @param array $joins
+     * @return mixed
+     */
+    public function where(array $conditions,  array $columns, array $joins);
 
     /**
      * @param $field

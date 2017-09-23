@@ -36,8 +36,7 @@ class Meal
      */
     public function getResponse()
     {
-        $query = $this
-            ->queryBuilder->generateQuery(
+        $query = $this->queryBuilder->generateQuery(
                 $this->request->all()
             );
         $query->groupBy(

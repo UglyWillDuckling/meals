@@ -40,11 +40,17 @@ class EndpointController extends Controller
     {
         $repository = $this->repository;
 
-        $all =$repository->getAllWithTranslations([
-            'tags', 'ingredients'
+
+        $result = $repository->where([
+            [
+                'column' => 'status',
+                'operator' => '=',
+                'value' => 3
+            ]
         ]);
 
-        dd($all->first());
+
+        dd($result);
     }
 }
 

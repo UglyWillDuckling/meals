@@ -4,7 +4,6 @@ namespace App\Repository\Repositories;
 
 use App\Repository\AbstractRepository;
 use App\Meal;
-use Illuminate\Database\Query\Grammars\MySqlGrammar;
 
 
 class MealRepository extends AbstractRepository implements MealRepositoryInterface
@@ -15,16 +14,6 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
      * @var \Illuminate\Database\Eloquent\Builder
      */
     private $query;
-
-
-    public function __construct(Meal $model)
-    {
-        parent::__construct($model);
-        $this->mealQuery = Meal::query();
-        $this->query = app()->make('Illuminate\Database\Eloquent\Builder');;
-        $this->query->getQuery()->grammar = new MySqlGrammar();
-    }
-
 
     public function attachTranslations()
     {
@@ -68,6 +57,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         $query->getQuery()->wheres = [];
         $query->getQuery()->columns = [];
         $query->getQuery()->joins = [];
+        //reset the query
 
         $ids = $meals->pluck('id')->toArray();
         $relatedModel = $relation->getModel();
