@@ -3,33 +3,31 @@ namespace App\Repository;
 
 use App\Meal;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
+use App\Repository\Repositories\Query\QueryBuilder;
 
 
 class AbstractRepository implements RepositoryInterface
 {
     private $model;
 
-    /**
-     * @var \Illuminate\Database\Eloquent\Builder
-     */
     private $mealQuery;
 
-    /**
-     * @var \Illuminate\Database\Eloquent\Builder
-     */
     private $query;
+
+    private $queryBuilder;
 
 
     /**
      * AbstractRepository constructor.
      * @param \Illuminate\Database\Eloquent\Model $model
      */
-    public function __construct(\Illuminate\Database\Eloquent\Model $model)
+    public function __construct(\Illuminate\Database\Eloquent\Model $model, QueryBuilder $queryBuilder)
     {
         $this->model = $model;
         $this->mealQuery = Meal::query();
         $this->query = app()->make('Illuminate\Database\Eloquent\Builder');
         $this->query->getQuery()->grammar = new MySqlGrammar();
+        $this->queryBuilder = $queryBuilder;
     }
 
 
@@ -97,30 +95,56 @@ class AbstractRepository implements RepositoryInterface
         $this->getModel()->create($attributes);
     }
 
+
+    /**
+     * @param array $conditions
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function where(array $conditions)
+    {
+        return $this->_where($conditions);
+    }
+
+
+    /**
+     * @param array $condtions
+     * @param array $relations
+     */
+    public function whereWithRelations(array $condtions, array $relations)
+    {
+        $this->_where($conditions, '*', $relations);
+    }
+
     /**
      * @param array $conditions
      * @param array $joins
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function where(array $conditions, array $columns = array(), array $joins = array())
+    protected function _where(array $conditions, $columns = '*', array $relations = array(), array $joins = array())
     {
-        $this->_resetMealQuery();
-        $query = $this->getQuery();
+        $query = $this->getQuery()->getQuery();
+        $this->queryBuilder->resetQuery($query);
+
         foreach ($conditions as $condition) {
-            $this->_addWhere(
+            $this->queryBuilder->addWhere(
                 $query,
                 $condition['column'],
                 $condition['operator'], $condition['value']
             );
         }
         if ($joins) {
-            $this->_addJoins($joins);
+            $this->queryBuilder->addJoins($joins, $query->getQuery());
         }
-        return $query
-            ->addSelect(
-                $columns ?: '*')
+        if ($relations) {
+            $this->getQuery()->with(implode(', ', $relations));
+        }
+
+        return $query->addSelect(
+            $columns ?: '*')
             ->get();
     }
+
+
 
     /**
      * @param array $joins
@@ -158,6 +182,39 @@ class AbstractRepository implements RepositoryInterface
         return $this->mealQuery;
     }
 
+    protected function _generateJoinArrayFromRelations(array $relations)
+    {
+        $joins = [];
+        foreach ($relations as $relation) {
+            //get translation table and alias
+            $decorator =
+                'App' . '\\' .
+                str_replace(' ', '', ucwords(
+                    str_replace('_', ' ', $relation)));
+
+            if (class_exists($decorator) && $this->_hasTranslatableInteface($decorator)) {
+                $table =  $decorator::getTable();
+                $alias =  $decorator::getTableAlias();
+            }
+
+            $joins[] = [
+                $table,
+                $alias,
+                '='
+            ];
+        }
+    }
+
+    private function _hasTableInterface(array $interfaces = [])
+    {
+        return in_array('TranslatableInterface', $interfaces);
+    }
+
+    private function _hasTranslatableInteface(array $interfaces = [])
+    {
+        return in_array('TranslatableInterface', $interfaces);
+    }
+
 
     /**
      * @param $query
@@ -186,8 +243,10 @@ class AbstractRepository implements RepositoryInterface
     private function _resetQuery()
     {
         $query = $this->query;
-        $query->getQuery()->wheres = [];
+        $query->getQuery() ->wheres = [];
         $query->getQuery()->columns = [];
         $query->getQuery()->joins = [];
     }
+
+
 }

@@ -4,8 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Meal;
-use App\Repository\RepositoryInterface;
-use App\Repository\Repositories\MealRepository;
 
 class HappyMeal extends ServiceProvider
 {

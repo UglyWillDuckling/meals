@@ -73,7 +73,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
 
         $query->join("{$pivot}", function (\Illuminate\Database\Query\JoinClause $join)
         use($ids, $pivot, $related_table, $relatedModel) {
-            $join->on("{$pivot}.{$relatedModel->getForeignKey()}", '=', "{$related_table}.id");//todo store  the foreign key columns somewhere
+            $join->on("{$pivot}.{$relatedModel->getForeignKey()}", '=', "{$related_table}.id");
             $join->whereIn("{$pivot}.{$this->getModel()->getForeignKey()}", $ids);
         });
 
@@ -100,7 +100,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
      * @param string $lang
      * @return array|bool
      */
-    public function getAllWithTranslations($relations = [], $lang = '1')
+    public function getAllWithTranslations($relations = [], $lang = '1')//TODO rewrite this so it only gets the data for the meals
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = $this->query;
@@ -121,7 +121,12 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
     }
 
 
-
+    /**
+     * @param array $results
+     * @param $models
+     * @param string $foreign_key
+     * @return mixed
+     */
     protected function _joinResultsToModels(array $results, $models, $foreign_key = 'meal_id')
     {
         foreach ($results as $relation => $result) {
@@ -134,5 +139,24 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
             }
         }
         return $models;
+    }
+
+
+    /**
+     * @param array $conditions
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function whereWithTranslations(array $conditions)
+    {
+        return $this->_where($conditions, '*', [
+            'table' => 'meals_translation',
+            'table_alias' => Meal::getTableAlias('meals_translation'),
+            'operator' => '='
+        ]);
+    }
+
+    public function whereWithRelations($condtions, $relations)
+    {
+
     }
 }

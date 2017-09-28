@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Interfaces\TableInterface;
 
-class Tag extends Model
+
+
+class Tag extends Model implements TableInterface
 {
+    public static $tableName = 'tag';
+    public static $tableAlias = 'tag';
+
+
     protected $table = 'tag';
     protected $hidden = [
         'pivot'
@@ -31,5 +38,15 @@ class Tag extends Model
     public function getMealsForeignKey()
     {
         return self::PIVOT_FOREIGN_KEY;
+    }
+
+    public static function getTableName()
+    {
+        return self::$tableName;
+    }
+
+    public static function getTableAlias()
+    {
+        return self::$tableAlias;
     }
 }

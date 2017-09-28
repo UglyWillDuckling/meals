@@ -11,9 +11,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Meal;
-use App\Repository\RepositoryInterface;
 use App\Repository\Repositories\MealRepository;
 use App\Repository\Repositories\MealRepositoryInterface;
+use App\Repository\Repositories\Query\QueryBuilder;
 
 
 class RepositoryProvider extends ServiceProvider
@@ -25,7 +25,7 @@ class RepositoryProvider extends ServiceProvider
         $this->app->bind(MealRepositoryInterface::class, MealRepository::class);
 
         $this->app->singleton(MealRepository::class, function ($app) {
-            return new MealRepository(new Meal());
+            return new MealRepository(new Meal(), new QueryBuilder());
         });
     }
 }

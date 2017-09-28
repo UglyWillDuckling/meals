@@ -28,7 +28,7 @@ interface RepositoryInterface
      * @param array $joins
      * @return mixed
      */
-    public function where(array $conditions,  array $columns, array $joins);
+    public function where(array $conditions);
 
     /**
      * @param $field
