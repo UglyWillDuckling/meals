@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Helper\Meal;
 use App\Http\Response\Transform\Api as TransformApi;
-use App\Repository\RepositoryInterface;
 use App\Repository\Repositories\MealRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 
 class EndpointController extends Controller
@@ -19,7 +19,7 @@ class EndpointController extends Controller
      */
     private $transformApi;
     /**
-     * @var RepositoryInterface
+     * @var MealRepositoryInterface
      */
     private $repository;
 
@@ -39,8 +39,20 @@ class EndpointController extends Controller
 
     public function repotest()
     {
+        DB::enableQueryLog();
+
         $repository = $this->repository;
 
+
+        $result = $repository->whereWithTranslationsAdditional([],[
+            'tags' => function ($q) {
+                $q->where('slug', '=', 'nihil');
+            }
+        ]);
+
+//        dd(DB::getQueryLog());
+
+        dd($result);
 
         $result = $repository->where([
             [
@@ -58,10 +70,6 @@ class EndpointController extends Controller
 
             ]
         );
-
         dd($result);
     }
 }
-
-
-

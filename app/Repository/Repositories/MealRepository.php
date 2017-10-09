@@ -4,6 +4,9 @@ namespace App\Repository\Repositories;
 
 use App\Repository\AbstractRepository;
 use App\Meal;
+use Illuminate\Support\Facades\DB;
+
+use function foo\func;
 
 
 class MealRepository extends AbstractRepository implements MealRepositoryInterface
@@ -15,7 +18,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
      */
     private $query;
 
-    public function attachTranslations()
+    public function attachTranslations($meals)
     {
         if (!$meals) {
             return false;
@@ -148,15 +151,39 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
      */
     public function whereWithTranslations(array $conditions)
     {
-        return $this->_where($conditions, '*', [
+        return $this->_where($conditions, '*', [], [
             'table' => 'meals_translation',
             'table_alias' => Meal::getTableAlias('meals_translation'),
             'operator' => '='
         ]);
     }
 
-    public function whereWithRelations($condtions, $relations)
+    /**
+     * @param array $conditions
+     * @param array $relationalConditions
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function whereWithTranslationsAdditional(array $conditions = [], array $relationalConditions = [])
     {
+        $query = $this->getQuery();
 
+        $relations = [
+            'tags',
+            'ingredients',
+        ];
+
+        foreach ($relations as $relation) {
+            if (array_key_exists($relation, $relationalConditions) && is_callable($relationalConditions[$relation])) {
+                //addd the callback to the relation
+                $query->whereHas($relation, $relationalConditions[$relation]);
+            }
+        }
+
+        //attach the translation relationships
+        $query->with(array_map(function ($value) {
+            return $value . 'WithTranslation';
+        }, $relations));
+
+        return $query->get();
     }
 }

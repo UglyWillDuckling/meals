@@ -110,7 +110,7 @@ class AbstractRepository implements RepositoryInterface
      * @param array $condtions
      * @param array $relations
      */
-    public function whereWithRelations(array $condtions, array $relations)
+    public function whereWithRelations(array $conditions, array $relations)
     {
         $this->_where($conditions, '*', $relations);
     }
@@ -138,9 +138,8 @@ class AbstractRepository implements RepositoryInterface
         if ($relations) {
             $this->getQuery()->with(implode(', ', $relations));
         }
-
-        return $query->addSelect(
-            $columns ?: '*')
+        return $query
+            ->addSelect($columns ?: '*')
             ->get();
     }
 
@@ -177,8 +176,10 @@ class AbstractRepository implements RepositoryInterface
         }
     }
 
-    protected function getQuery()
-    {
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function getQuery(){
         return $this->mealQuery;
     }
 
@@ -192,7 +193,7 @@ class AbstractRepository implements RepositoryInterface
                 str_replace(' ', '', ucwords(
                     str_replace('_', ' ', $relation)));
 
-            if (class_exists($decorator) && $this->_hasTranslatableInteface($decorator)) {
+            if (class_exists($decorator) && $this->_hasTranslatableInterface($decorator)) {
                 $table =  $decorator::getTable();
                 $alias =  $decorator::getTableAlias();
             }
@@ -207,46 +208,11 @@ class AbstractRepository implements RepositoryInterface
 
     private function _hasTableInterface(array $interfaces = [])
     {
-        return in_array('TranslatableInterface', $interfaces);
+        return in_array('TableInterface', $interfaces);
     }
 
-    private function _hasTranslatableInteface(array $interfaces = [])
+    private function _hasTranslatableInterface(array $interfaces = [])
     {
         return in_array('TranslatableInterface', $interfaces);
     }
-
-
-    /**
-     * @param $query
-     * @param $column
-     * @param $operator
-     * @param $value
-     */
-    private function _addWhere($query, $column, $operator, $value) {
-        if ($operator == 'in    ') {
-            $query->whereIn($column, array($value));
-        } else {
-            $query->where(
-                $column, $operator, $value
-            );
-        };
-    }
-
-    private function _resetMealQuery()
-    {
-        $query = $this->mealQuery;
-        $query->getQuery()->wheres = [];
-        $query->getQuery()->columns = [];
-        $query->getQuery()->joins = [];
-    }
-
-    private function _resetQuery()
-    {
-        $query = $this->query;
-        $query->getQuery() ->wheres = [];
-        $query->getQuery()->columns = [];
-        $query->getQuery()->joins = [];
-    }
-
-
 }

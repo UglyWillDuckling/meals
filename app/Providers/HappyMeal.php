@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Meal;
+use App\Registry\Registry;
 
 class HappyMeal extends ServiceProvider
 {
