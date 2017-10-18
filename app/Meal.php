@@ -70,8 +70,7 @@ class Meal extends Model
                 'slug',
             ]);
         //fire the meal relation event before method end
-        echo "by";
-        event(new Meal_Relation_Event($relation));
+        event('meals.relation',new Events\Meal_Relation_Event($relation));
 
         return $relation;
     }

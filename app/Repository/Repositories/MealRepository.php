@@ -163,12 +163,12 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         }, $relations));
 
         //attach the events in case there are relationship conditions
-        Event::listen('Meal_Relation_Event', function ($eventName, array $data) use($relationalConditions) {
-            die("hello");
-            $relation = $data[0];
+        Event::listen('meals.relation', function ($event) use($relationalConditions) {
+            $relation = $event->relation;
             //add the appropriate relationship conditions
-            if (isset($relationalConditions[''])) {
+            if (isset($relationalConditions[$relation->getRelationName()])) {
                 //add the condition
+                $relation->where('slug', '=', 'nihil');
             }
         });
 
