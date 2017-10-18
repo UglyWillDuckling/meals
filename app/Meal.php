@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Registry\Registry;
+use App\Events\Meal_Relation_Event;
 
 
 class Meal extends Model
@@ -59,7 +60,7 @@ class Meal extends Model
 
     public function tagsWithTranslation(){
         $_this = $this;
-        return $this->tags()
+        $relation =  $this->tags()
             ->join('tags_translation as tt', function (\Illuminate\Database\Query\JoinClause $join) use($_this){
                 $join->on('tt.tag_id', '=', 'tag.id');
                 $join->where('tt.language_id', '=', $_this->getLanguage());
@@ -68,6 +69,11 @@ class Meal extends Model
                 'tt.title',
                 'slug',
             ]);
+        //fire the meal relation event before method end
+        echo "by";
+        event(new Meal_Relation_Event($relation));
+
+        return $relation;
     }
 
 
@@ -105,7 +111,7 @@ class Meal extends Model
 
     public function categoryWithTranslation(){
         $_this = $this;
-        return $this->category()
+        $relation =  $this->category()
             ->join('category_translation as ct', function (\Illuminate\Database\Query\JoinClause $join) use($_this) {
                 $join->on('ct.category_id', '=', 'category.id');
                 $join->where('ct.language_id', '=', $_this->getLanguage());
@@ -114,6 +120,7 @@ class Meal extends Model
                 'ct.title',
                 'slug',
             ]);
+        return $relation;
     }
 
     /**

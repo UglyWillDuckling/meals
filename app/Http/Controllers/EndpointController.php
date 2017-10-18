@@ -28,6 +28,7 @@ class EndpointController extends Controller
         $this->mealHelper = $mealHelper;
         $this->transformApi = $transformApi;
         $this->repository = $repository;
+        DB::enableQueryLog();//todo remove this
     }
 
     public function index()
@@ -37,12 +38,12 @@ class EndpointController extends Controller
         );
     }
 
+    /**
+     *
+     */
     public function repotest()
     {
-        DB::enableQueryLog();
-
         $repository = $this->repository;
-
 
         $result = $repository->whereWithTranslationsAdditional([],[
             'tags' => function ($q) {
@@ -50,26 +51,7 @@ class EndpointController extends Controller
             }
         ]);
 
-//        dd(DB::getQueryLog());
-
-        dd($result);
-
-        $result = $repository->where([
-            [
-                'column' => 'status',
-                'operator' => '=',
-                'value' => 3
-            ]
-        ], [],
-            [
-                [
-                    'table' => 'meals_translation',
-                    'table_alias' => 'mt',
-                    'operator' => '='
-                ]
-
-            ]
-        );
+        dd(DB::getQueryLog());
         dd($result);
     }
 }

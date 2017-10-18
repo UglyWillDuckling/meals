@@ -5,6 +5,8 @@ namespace App\Repository\Repositories;
 use App\Repository\AbstractRepository;
 use App\Meal;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+
 
 use function foo\func;
 
@@ -17,33 +19,6 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
      * @var \Illuminate\Database\Eloquent\Builder
      */
     private $query;
-
-    public function attachTranslations($meals)
-    {
-        if (!$meals) {
-            return false;
-        }
-
-        if(!is_a($meals, 'Illuminate\Database\Eloquent\Collection')) {
-            $meals = collect($meals);
-        }
-
-        foreach ($meals as $meal) {
-            /**
-             * @var $meal \Illuminate\Database\Eloquent\Model
-             */
-            foreach ($relations as $relationAlias) {
-                /**
-                 * @var \Illuminate\Database\Eloquent\Relations\Relation $relation
-                 */
-                $relation = $meal->{$relationAlias}();
-
-                $this->_joinTranslationTable($relation, $lang);
-
-                $meal->with($relationAlias);
-            }
-        }
-    }
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -167,22 +142,35 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
     {
         $query = $this->getQuery();
 
+        //todo add the conditions
+
+
         $relations = [
             'tags',
             'ingredients',
         ];
 
+        //first add the conditions to the relations
         foreach ($relations as $relation) {
             if (array_key_exists($relation, $relationalConditions) && is_callable($relationalConditions[$relation])) {
                 //addd the callback to the relation
                 $query->whereHas($relation, $relationalConditions[$relation]);
             }
         }
-
         //attach the translation relationships
         $query->with(array_map(function ($value) {
             return $value . 'WithTranslation';
         }, $relations));
+
+        //attach the events in case there are relationship conditions
+        Event::listen('Meal_Relation_Event', function ($eventName, array $data) use($relationalConditions) {
+            die("hello");
+            $relation = $data[0];
+            //add the appropriate relationship conditions
+            if (isset($relationalConditions[''])) {
+                //add the condition
+            }
+        });
 
         return $query->get();
     }
