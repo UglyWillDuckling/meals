@@ -51,7 +51,7 @@ class EndpointController extends Controller
             }
         ]);
 
-        dd(DB::getQueryLog());
+      //  dd(DB::getQueryLog());
         dd($result);
     }
 }

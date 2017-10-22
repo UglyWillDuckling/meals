@@ -154,7 +154,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
 
         //attach the translation relationships
         $query->with(array_map(function ($value) {
-            return $value . '';
+            return $value . 'WithTranslation';
         }, $relations));
 
 
@@ -165,7 +165,7 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
             $relation = $event->relation;
             if (isset($relationalConditions[$relation->getRelationName()])) {
                 //add the condition
-                $relation->where('slug', '=', 'nihil');
+                $relation->where($relationalConditions[$relation->getRelationName()]);
             }
         });
 
