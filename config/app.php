@@ -178,7 +178,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryProvider::class,
         App\Providers\HappyMeal::class,
-
     ],
 
     /*

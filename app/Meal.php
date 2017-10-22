@@ -3,10 +3,10 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Http\Request;
 use App\Registry\Registry;
-use App\Events\Meal_Relation_Event;
-
+use App\Laravel\Eloquent\Query\Builder;
 
 class Meal extends Model
 {
@@ -69,9 +69,6 @@ class Meal extends Model
                 'tt.title',
                 'slug',
             ]);
-        //fire the meal relation event before method end
-        event('meals.relation',new Events\Meal_Relation_Event($relation));
-
         return $relation;
     }
 
@@ -139,5 +136,12 @@ class Meal extends Model
             }
         }
         return $this->lang;
+    }
+
+    public function newEloquentBuilder($query)
+    {
+        $builder =  new Builder($query);
+        $builder->getQuery()->grammar = new MySqlGrammar();
+        return $builder;
     }
 }

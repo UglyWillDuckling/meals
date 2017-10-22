@@ -11,20 +11,16 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 
-class Meal_Relation_Event
+class Relations_Loaded_Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $relation;
+    public $relations;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct($relation)
+
+    public function __construct($relations)
     {
-        $this->relation = $relation;
+        $this->relations = $relations;
     }
 
     /**
@@ -34,6 +30,6 @@ class Meal_Relation_Event
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('meal-channel');
+        return new PrivateChannel('app-channel');
     }
 }

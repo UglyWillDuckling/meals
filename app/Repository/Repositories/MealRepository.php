@@ -145,27 +145,24 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
         //todo add the conditions
 
 
+        //todo add the conditions
+
         $relations = [
             'tags',
             'ingredients',
         ];
 
-        //first add the conditions to the relations
-        foreach ($relations as $relation) {
-            if (array_key_exists($relation, $relationalConditions) && is_callable($relationalConditions[$relation])) {
-                //addd the callback to the relation
-                $query->whereHas($relation, $relationalConditions[$relation]);
-            }
-        }
         //attach the translation relationships
         $query->with(array_map(function ($value) {
-            return $value . 'WithTranslation';
+            return $value . '';
         }, $relations));
 
+
+        $_this = $this;
         //attach the events in case there are relationship conditions
-        Event::listen('meals.relation', function ($event) use($relationalConditions) {
+        Event::listen('meals.relation_load', function ($event) use($relationalConditions) {
+
             $relation = $event->relation;
-            //add the appropriate relationship conditions
             if (isset($relationalConditions[$relation->getRelationName()])) {
                 //add the condition
                 $relation->where('slug', '=', 'nihil');
