@@ -6,6 +6,7 @@ use App\Http\Helper\Meal;
 use App\Http\Response\Transform\Api as TransformApi;
 use App\Repository\Repositories\MealRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 
 class EndpointController extends Controller
@@ -41,17 +42,19 @@ class EndpointController extends Controller
     /**
      *
      */
-    public function repotest()
+    public function repotest(Request $request)
     {
         $repository = $this->repository;
 
+        $tagIds = explode(',', $request->tags);
+
         $result = $repository->whereWithTranslationsAdditional([],[
-            'tags' => function ($q) {
-                $q->where('slug', '=', 'nihil');
+            'tags' => function ($q) use($tagIds) {
+                $q->whereIn($q->getModel()->getTable() . '.id', $tagIds);
             }
         ]);
 
-      //  dd(DB::getQueryLog());
+       // dd(DB::getQueryLog());
         dd($result);
     }
 }
