@@ -48,13 +48,19 @@ class EndpointController extends Controller
 
         $tagIds = explode(',', $request->tags);
 
-        $result = $repository->whereWithTranslationsAdditional([],[
+        $result = $repository->whereWithTranslationsAdditional([
+            [
+                'column' => 'slug',
+                'operator' => '=',
+                'value' => 'similique'
+            ]
+        ],[
             'tags' => function ($q) use($tagIds) {
                 $q->whereIn($q->getModel()->getTable() . '.id', $tagIds);
             }
         ]);
 
-       // dd(DB::getQueryLog());
+//        dd(DB::getQueryLog());
         dd($result);
     }
 }

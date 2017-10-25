@@ -134,39 +134,48 @@ class MealRepository extends AbstractRepository implements MealRepositoryInterfa
     }
 
     /**
+     * @param int $language
      * @param array $conditions
      * @param array $relationalConditions
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function whereWithTranslationsAdditional(array $conditions = [], array $relationalConditions = [])
-    {
+    public function whereWithTranslationsAdditional(array $conditions = [], array $relationalConditions = [], int $language = 0){
         $query = $this->getQuery();
-
-        //todo add the conditions
-
-
-        //todo add the conditions
 
         $relations = [
             'tags',
             'ingredients',
         ];
-
         //attach the translation relationships
         $query->with(array_map(function ($value) {
             return $value . 'WithTranslation';
         }, $relations));
-
-
+        //add the conditions for specific relations
         if ($relationalConditions) {
             $_this = $this;
-            Event::listen('meals.relation_load', function ($event) use($relationalConditions) {//add the conditions for specific relations
+            Event::listen('meals.relation_load', function ($event) use($relationalConditions) {
                 $relation = $event->relation;
                 if (isset($relationalConditions[$relation->getRelationName()])) {
                     $relation->where($relationalConditions[$relation->getRelationName()]);
                 }
             });
         }
-        return $query->get();
+        //check for language
+        if (!$language) {
+            $language = $this->getDefaultLanguage();
+        }
+        //add the conditions and join on translation table
+        return $this->_where($conditions, '*', [
+            [
+                'table' => 'meals_translation',
+                'table_alias' => Meal::getTableAlias('meals_translation'),
+                'operator' => '=',
+                'where' => [
+                    'column' => 'language_id',
+                    'operator' => '=',
+                    'value' => $language
+                ]
+            ]
+        ]);
     }
 }

@@ -120,9 +120,9 @@ class AbstractRepository implements RepositoryInterface
      * @param array $joins
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    protected function _where(array $conditions, $columns = '*', array $relations = array(), array $joins = array())
+    protected function _where(array $conditions, $columns = '*', array $joins = array())
     {
-        $query = $this->getQuery()->getQuery();
+        $query = $this->getQuery();
         $this->queryBuilder->resetQuery($query);
 
         foreach ($conditions as $condition) {
@@ -133,10 +133,7 @@ class AbstractRepository implements RepositoryInterface
             );
         }
         if ($joins) {
-            $this->queryBuilder->addJoins($joins, $query->getQuery());
-        }
-        if ($relations) {
-            $this->getQuery()->with(implode(', ', $relations));
+            $this->queryBuilder->addJoins($joins, $query);
         }
         return $query
             ->addSelect($columns ?: '*')
@@ -183,27 +180,8 @@ class AbstractRepository implements RepositoryInterface
         return $this->mealQuery;
     }
 
-    protected function _generateJoinArrayFromRelations(array $relations)
-    {
-        $joins = [];
-        foreach ($relations as $relation) {
-            //get translation table and alias
-            $decorator =
-                'App' . '\\' .
-                str_replace(' ', '', ucwords(
-                    str_replace('_', ' ', $relation)));
-
-            if (class_exists($decorator) && $this->_hasTranslatableInterface($decorator)) {
-                $table =  $decorator::getTable();
-                $alias =  $decorator::getTableAlias();
-            }
-
-            $joins[] = [
-                $table,
-                $alias,
-                '='
-            ];
-        }
+    protected function getDefaultLanguage(){
+        return 1;
     }
 
     private function _hasTableInterface(array $interfaces = [])
@@ -214,5 +192,5 @@ class AbstractRepository implements RepositoryInterface
     private function _hasTranslatableInterface(array $interfaces = [])
     {
         return in_array('TranslatableInterface', $interfaces);
-    }
+   }
 }
